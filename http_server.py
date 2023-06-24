@@ -1,24 +1,48 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
+import paramiko
+import time
 
 HOST = "127.0.0.1"
 PORT = 9999
+
+"""
+Typical command
+curl http://127.0.0.1:9999/home/ganyush/adiostests/test.bp/md.idx -i -H "Range: bytes=0-10"
+"""
+transport = paramiko.Transport(("localhost", 22))
+# Auth username,password = "bar","foo"
+transport.connect(None, "ganyush", "Ugmetpamcirj21*(")
+# Go!
+sftp = paramiko.SFTPClient.from_transport(transport)
 class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
 
     def do_GET(self):
         print(self.headers)
         print(self.command)
         print(self.path)
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
+        # self.send_response(200)
+        # self.send_header("Content-type", "text/html")
+        # self.end_headers()
+        filepath = self.path
+        remote_file = sftp.file(filepath, 'r')
+        ranges = self.headers["Range"].split("=")[1].split("-")
+        start_byte = int(ranges[0])
+        end_byte = int(ranges[1])
+        remote_file.seek(start_byte)  # Move the file pointer to the desired starting byte
+        data = remote_file.read(end_byte - start_byte + 1)
+        print(data)
 
-        self.wfile.write(bytes("<html><body><h1>HELLO WORLD!</h1></body></html>", "utf-8"))
+        """send data back"""
+        self.wfile.write(data)
+
+
 
 server = HTTPServer((HOST, PORT), ADIOS_HTTP_Request)
 print("Server now serving ...")
 print('Starting server, use <Ctrl-C> to stop')
 
 server.serve_forever()
+
 server.server_close()
 print("Server stopped")
 
