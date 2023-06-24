@@ -1,6 +1,6 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import paramiko
-import time
+import getpass
 
 HOST = "127.0.0.1"
 PORT = 9999
@@ -9,20 +9,13 @@ PORT = 9999
 Typical command
 curl http://127.0.0.1:9999/home/ganyush/adiostests/test.bp/md.idx -i -H "Range: bytes=0-10"
 """
-transport = paramiko.Transport(("localhost", 22))
-# Auth username,password = "bar","foo"
-transport.connect(None, "ganyush", "Ugmetpamcirj21*(")
-# Go!
-sftp = paramiko.SFTPClient.from_transport(transport)
+
 class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
 
     def do_GET(self):
         print(self.headers)
         print(self.command)
         print(self.path)
-        # self.send_response(200)
-        # self.send_header("Content-type", "text/html")
-        # self.end_headers()
         filepath = self.path
         remote_file = sftp.file(filepath, 'r')
         ranges = self.headers["Range"].split("=")[1].split("-")
@@ -35,11 +28,18 @@ class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
         """send data back"""
         self.wfile.write(data)
 
+transport = paramiko.Transport(("localhost", 22))
+# Auth username,password = "bar","foo"
 
+user = input("Username: ")
+password = getpass.getpass(prompt='Password: ', stream=None)
+
+transport.connect(None, user, password)
+# Go!
+sftp = paramiko.SFTPClient.from_transport(transport)
 
 server = HTTPServer((HOST, PORT), ADIOS_HTTP_Request)
 print("Server now serving ...")
-print('Starting server, use <Ctrl-C> to stop')
 
 server.serve_forever()
 
