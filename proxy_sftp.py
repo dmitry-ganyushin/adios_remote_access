@@ -5,7 +5,6 @@
 # Distributed over MIT license
 import socket
 import select
-import time
 import sys
 
 buffer_size = 4096
@@ -21,7 +20,7 @@ class Forward:
             return self.forward
         except Exception as inst:
             print("[exception] - {0}".format(inst.strerror))
-            return False    
+            return False
 
 class TheServer:
     input_list = []
@@ -71,7 +70,7 @@ class TheServer:
         self.input_list.remove(self.channel[s])
         out = self.channel[s]
         # close the connection with client
-        self.channel[out].close()  
+        self.channel[out].close()
         # close the connection with remote server
         self.channel[s].close()
         # delete both objects from channel dict
