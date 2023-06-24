@@ -6,6 +6,8 @@
 import socket
 import select
 import sys
+import paramiko
+import time
 
 buffer_size = 4096
 forward_to = ("127.0.0.1", 8000)
@@ -31,6 +33,11 @@ class TheServer:
         self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server.bind((host, port))
         self.server.listen(200)
+        self.transport = paramiko.Transport(("localhost", 22))
+        self.transport.connect(None, "ganyush", "Ugmetpamcirj21*(")
+        self.sftp = paramiko.SFTPClient.from_transport(self.transport)
+        return
+
 
     def main_loop(self):
         self.input_list.append(self.server)
@@ -50,8 +57,10 @@ class TheServer:
                     self.on_recv(s)
 
     def on_accept(self, s):
-        """handshake"""
+        """socket for forwarding"""
         forward = Forward().start(forward_to[0], forward_to[1])
+        # clinet socket is single
+        #forward = self.sftp
         clientsock, clientaddr = self.server.accept()
         if forward:
             print("{0} has connected".format(clientaddr))
