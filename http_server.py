@@ -32,7 +32,10 @@ transport = paramiko.Transport(("localhost", 22))
 # Auth username,password = "bar","foo"
 
 user = input("Username: ")
-password = getpass.getpass(prompt='Password: ', stream=None)
+try:
+    password = getpass.getpass()
+except Exception as error:
+    print('ERROR', error)
 
 transport.connect(None, user, password)
 # Go!
