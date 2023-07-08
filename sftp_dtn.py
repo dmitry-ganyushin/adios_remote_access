@@ -8,7 +8,7 @@ end_byte = 10  # Ending byte index (e.g., 1023 for the first 1KB)
 host, port = "localhost", 22
 transport = paramiko.Transport((host, port))
 # Auth username,password = "bar","foo"
-transport.connect(None, "ganyush", "Ugmetpamcirj21*(")
+transport.connect(None, "", "")
 # Go!
 sftp = paramiko.SFTPClient.from_transport(transport)  # data0
 # sftp1 = paramiko.SFTPClient.from_transport(transport) # data1

@@ -34,7 +34,7 @@ class TheServer:
         self.server.bind((host, port))
         self.server.listen(200)
         self.transport = paramiko.Transport(("localhost", 22))
-        self.transport.connect(None, "ganyush", "Ugmetpamcirj21*(")
+        self.transport.connect(None, "", "")
         self.sftp = paramiko.SFTPClient.from_transport(self.transport)
         return
 
