@@ -14,9 +14,9 @@ int main(int argc, char** argv) {
     char buffer[BUFSIZ];
     enum CONSTEXPR { MAX_REQUEST_LEN = 1024};
     char request[MAX_REQUEST_LEN];
-    char request_template[] = "GET /%s HTTP/1.1\r\nHost: %s\r\nRange: bytes%d-%d\r\n\r\n";
+    char request_template[] = "GET /%s HTTP/1.1\r\nHost: %s\r\nRange: bytes=%d-%d\r\n\r\n";
     struct protoent *protoent;
-    char *hostname = "example.com";
+    char *hostname;
     in_addr_t in_addr;
     int request_len;
     int socket_file_descriptor;
