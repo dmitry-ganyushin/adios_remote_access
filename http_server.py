@@ -28,7 +28,8 @@ class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
         """send data back"""
         self.wfile.write(data)
 
-transport = paramiko.Transport(("localhost", 22))
+REMOTE_HOST = input("hostname: ")
+transport = paramiko.Transport((REMOTE_HOST, 22))
 # Auth username,password = "bar","foo"
 
 user = input("Username: ")
