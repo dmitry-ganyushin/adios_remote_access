@@ -16,18 +16,20 @@ REMOTE_HOST = input("hostname: ")
 transport = paramiko.Transport((REMOTE_HOST, 22))
 
 user = input("Username: ")
+key = input("Key:")
+if key != "":
+    key_passphrase = input("Key passphrase:")
 try:
     password = getpass.getpass()
 except Exception as error:
     print('ERROR', error)
 #user = ""
 #password = ""
-key = input("Key:")
-print("key = : {}".format(key))
+
 if key == "":
     transport.connect(None, user, password)
 else:
-    private_key = paramiko.RSAKey.from_private_key_file(key)
+    private_key = paramiko.RSAKey.from_private_key_file(key, password=key_passphrase)
     transport.connect(None, user, password, pkey=key)
 
 # Go!
