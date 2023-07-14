@@ -30,7 +30,7 @@ if key == "":
     transport.connect(None, user, password)
 else:
     private_key = paramiko.RSAKey.from_private_key_file(key, password=key_passphrase)
-    transport.connect(None, user, password, pkey=key)
+    transport.connect(None, user, password, pkey=private_key)
 
 # Go!
 sftp = paramiko.SFTPClient.from_transport(transport)  # data0
