@@ -30,6 +30,8 @@ class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
             ranges = header.split("=")[1].split("-")
             start_byte = int(ranges[0])
             end_byte = int(ranges[1])
+            #TODODG
+            # make batches
             remote_file.seek(start_byte)  # Move the file pointer to the desired starting byte
             data = remote_file.read(end_byte - start_byte + 1)
 

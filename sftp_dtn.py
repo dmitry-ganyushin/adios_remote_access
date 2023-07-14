@@ -1,20 +1,41 @@
 import paramiko
 import time
+import getpass
 
 # paramiko.util.log_to_file("paramiko.log")
 start_byte = 0  # Starting byte index (0 for the beginning of the file)
-end_byte = 10  # Ending byte index (e.g., 1023 for the first 1KB)
+end_byte = 1024  # Ending byte index (e.g., 1023 for the first 1KB)
 # Open a transport
-host, port = "localhost", 22
-transport = paramiko.Transport((host, port))
-# Auth username,password = "bar","foo"
-transport.connect(None, "", "")
+# host, port = "localhost", 22
+# transport = paramiko.Transport((host, port))
+# # Auth username,password = "bar","foo"
+# transport.connect(None, "", "")
+
+REMOTE_HOST = input("hostname: ")
+#REMOTE_HOST = "localhost"
+transport = paramiko.Transport((REMOTE_HOST, 22))
+
+user = input("Username: ")
+try:
+    password = getpass.getpass()
+except Exception as error:
+    print('ERROR', error)
+#user = ""
+#password = ""
+key = input("Key:")
+print("key = : {}".format(key))
+if key == "":
+    transport.connect(None, user, password)
+else:
+    private_key = paramiko.RSAKey.from_private_key_file(key)
+    transport.connect(None, user, password, pkey=key)
+
 # Go!
 sftp = paramiko.SFTPClient.from_transport(transport)  # data0
 # sftp1 = paramiko.SFTPClient.from_transport(transport) # data1
 # Download
-filepath = "/home/ganyush/adiostests/test.bp/md.idx"  # data.0
-# filepath1 = "/ccs/home/ganyushin/data1" # data.0
+#filepath = "/home/ganyush/adiostests/test.bp/md.idx"  # data.0
+filepath = "/ccs/home/ganyushin/data" # data.0
 localpath = "/home/ganyush/adiostests/temp.txt"
 # sftp.get(filepath,localpath)
 start = time.time()
