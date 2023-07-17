@@ -1,3 +1,4 @@
+import sys
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import paramiko
 import getpass
@@ -50,26 +51,46 @@ class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
 
         self.wfile.write("Ok".encode("utf-8"))
 
+##################################################
 
 REMOTE_HOST = input("hostname: ")
-#REMOTE_HOST = "localhost"
-transport = paramiko.Transport((REMOTE_HOST, 22))
+
+if sys.argv[1] == "--auth=2":
+    auth_key = input("Auth key:")
+    key_password = ""
+    try:
+        key_password = getpass.getpass()
+    except Exception as error:
+        print('ERROR', error)
+    pkey = paramiko.RSAKey.from_private_key_file(auth_key, password=key_password)
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
 user = input("Username: ")
 try:
     password = getpass.getpass()
 except Exception as error:
     print('ERROR', error)
-#user = ""
-#password = ""
-transport.connect(None, user, password)
-# Go!
-sftp = paramiko.SFTPClient.from_transport(transport)
 
-server = HTTPServer((HOST, PORT), ADIOS_HTTP_Request)
-print("Server now serving ...")
+if __name__ == "__main__":
+    if sys.argv[1] == "--auth=2":
+        print("connecting ...")
+        client.connect( hostname=REMOTE_HOST, username=user, pkey=pkey, password=password)
+        print("connected")
+        sftp = client.open_sftp()
+    else:
+        #REMOTE_HOST = "localhost"
+        transport = paramiko.Transport((REMOTE_HOST, 22))
+        #user = ""
+        #password = ""
+        transport.connect(None, user, password)
+        # Go!
+        sftp = paramiko.SFTPClient.from_transport(transport)
 
-server.serve_forever()
+    server = HTTPServer((HOST, PORT), ADIOS_HTTP_Request)
+    print("Server now serving ...")
 
-server.server_close()
-print("Server stopped")
+    server.serve_forever()
+
+    server.server_close()
+    print("Server stopped")
