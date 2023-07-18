@@ -5,7 +5,6 @@ import getpass
 
 HOST = "127.0.0.1"
 PORT = 9999
-
 """
 Typical command
 curl http://127.0.0.1:9999/home/ganyush/adiostests/test.bp/md.idx -i -H "Range: bytes=0-10"
@@ -31,11 +30,11 @@ class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
             ranges = header.split("=")[1].split("-")
             start_byte = int(ranges[0])
             end_byte = int(ranges[1])
-            #TODODG
-            # make batches
-            remote_file.seek(start_byte)  # Move the file pointer to the desired starting byte
-            data = remote_file.read(end_byte - start_byte + 1)
 
+            block_size = end_byte - start_byte + 1
+            remote_file.seek(start_byte)
+            """this is in fact ADIOS2 block. Expecting a reasonable size"""
+            data = remote_file.read(block_size)
             """send data back"""
             self.wfile.write(data)
             return
@@ -55,7 +54,7 @@ class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
 
 REMOTE_HOST = input("hostname: ")
 
-if sys.argv[1] == "--auth=2":
+if len(sys.argv) > 1 and sys.argv[1] == "--auth=2":
     auth_key = input("Auth key:")
     key_password = ""
     try:
@@ -73,7 +72,7 @@ except Exception as error:
     print('ERROR', error)
 
 if __name__ == "__main__":
-    if sys.argv[1] == "--auth=2":
+    if len(sys.argv) > 1 and sys.argv[1] == "--auth=2":
         print("connecting ...")
         client.connect( hostname=REMOTE_HOST, username=user, pkey=pkey, password=password)
         print("connected")
