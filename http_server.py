@@ -19,10 +19,10 @@ class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
         # print(self.command)
         # print("PATH:")
         # print(self.path)
-        self.protocol_version = 'HTTP/1.1'
-        self.send_response(200, 'OK')
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
+        # self.protocol_version = 'HTTP/1.1'
+        # self.send_response(200, 'OK')
+        # self.send_header('Content-type', 'text/html')
+        # self.end_headers()
         filepath = self.path
         remote_file = sftp.file(filepath, 'r')
         header = self.headers["Range"]
