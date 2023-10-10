@@ -22,6 +22,7 @@ class FastTransport(paramiko.Transport):
         self.packetizer.REKEY_PACKETS = pow(2, 40)
 
 class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
+    protocol_version = 'HTTP/1.1'
     def do_GET(self):
         # print("HEADERS:")
         # print(self.headers)
@@ -29,7 +30,7 @@ class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
         # print(self.command)
         # print("PATH:")
         # print(self.path)
-        # self.protocol_version = 'HTTP/1.1'
+        #self.protocol_version = 'HTTP/1.1'
         # self.send_response(200, 'OK')
         # self.send_header('Content-type', 'text/html')
         # self.end_headers()
@@ -102,8 +103,9 @@ if __name__ == "__main__":
 
     try:
         # Listen for requests
-        server.serve_forever()
         print("Server now serving ...")
+        server.serve_forever()
+
     except KeyboardInterrupt:
         print("Shuting down")
         server.server_close()
