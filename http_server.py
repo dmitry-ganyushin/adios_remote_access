@@ -10,6 +10,13 @@ Typical command
 curl http://127.0.0.1:9999/home/ganyush/adiostests/test.bp/md.idx -i -H "Range: bytes=0-10"
 """
 
+class FastTransport(paramiko.Transport):
+
+    def __init__(self, sock):
+        super(FastTransport, self).__init__(sock)
+        self.window_size = 2147483647
+        self.packetizer.REKEY_BYTES = pow(2, 40)
+        self.packetizer.REKEY_PACKETS = pow(2, 40)
 
 class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -25,6 +32,7 @@ class ADIOS_HTTP_Request(BaseHTTPRequestHandler):
         # self.end_headers()
         filepath = self.path
         remote_file = sftp.file(filepath, 'r')
+        remote_file.prefetch()
         header = self.headers["Range"]
         if header:
             ranges = header.split("=")[1].split("-")
@@ -79,7 +87,8 @@ if __name__ == "__main__":
         sftp = client.open_sftp()
     else:
         #REMOTE_HOST = "localhost"
-        transport = paramiko.Transport((REMOTE_HOST, 22))
+        #transport = paramiko.Transport((REMOTE_HOST, 22))
+        transport = FastTransport((REMOTE_HOST, 22))
         #user = ""
         #password = ""
         transport.connect(None, user, password)
