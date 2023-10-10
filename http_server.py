@@ -1,5 +1,6 @@
 import sys
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from socketserver import ThreadingMixIn
 import paramiko
 import getpass
 
@@ -9,7 +10,9 @@ PORT = 9999
 Typical command
 curl http://127.0.0.1:9999/home/ganyush/adiostests/test.bp/md.idx -i -H "Range: bytes=0-10"
 """
-
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """An HTTP server that handle each request in a new  thread"""
+    daemon_threads = True
 class FastTransport(paramiko.Transport):
 
     def __init__(self, sock):
@@ -95,10 +98,13 @@ if __name__ == "__main__":
         # Go!
         sftp = paramiko.SFTPClient.from_transport(transport)
 
-    server = HTTPServer((HOST, PORT), ADIOS_HTTP_Request)
-    print("Server now serving ...")
+    server = ThreadedHTTPServer((HOST, PORT), ADIOS_HTTP_Request)
 
-    server.serve_forever()
+    try:
+        # Listen for requests
+        server.serve_forever()
+        print("Server now serving ...")
+    except KeyboardInterrupt:
+        print("Shuting down")
+        server.server_close()
 
-    server.server_close()
-    print("Server stopped")
