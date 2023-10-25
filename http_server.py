@@ -86,19 +86,18 @@ if __name__ == "__main__":
         print("connected")
         sftp = client.open_sftp()
     else:
-        #REMOTE_HOST = "localhost"
-        #transport = paramiko.Transport((REMOTE_HOST, 22))
         transport = FastTransport((REMOTE_HOST, 22))
-        #user = ""
-        #password = ""
         transport.connect(None, user, password)
-        # Go!
         sftp = paramiko.SFTPClient.from_transport(transport)
 
     server = HTTPServer((HOST, PORT), ADIOS_HTTP_Request)
-    print("Server now serving ...")
 
-    server.serve_forever()
+    try:
+        # Listen for requests
+        print("Server now serving ...")
+        server.serve_forever()
 
-    server.server_close()
-    print("Server stopped")
+    except KeyboardInterrupt:
+        print("Shuting down")
+        server.server_close()
+        print("Server stopped")
