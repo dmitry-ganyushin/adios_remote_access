@@ -5,6 +5,7 @@ import getpass
 import pycurl
 from io import BytesIO
 
+REMOTE_HOST = "localhost"
 HOST = "127.0.0.1"
 PORT = 9999
 """
@@ -54,7 +55,7 @@ class ADIOS_HTTP_PARAMIKO_Request(BaseHTTPRequestHandler):
 class ADIOS_HTTP_CURL_Request(BaseHTTPRequestHandler):
     def do_GET(self):
         filepath = self.path
-        curl.setopt(pycurl.URL, "sftp://localhost:" + filepath)
+        curl.setopt(pycurl.URL, "sftp://" + REMOTE_HOST + ":" + filepath)
         header = self.headers["Range"]
         if header:
             ranges = header.split("=")[1]
