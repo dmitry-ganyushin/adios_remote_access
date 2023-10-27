@@ -4,6 +4,7 @@ import paramiko
 import getpass
 import pycurl
 from io import BytesIO
+import logging
 
 HOST = "127.0.0.1"
 PORT = 9999
@@ -63,16 +64,18 @@ class ADIOS_HTTP_PARAMIKO_Request(BaseHTTPRequestHandler):
 
 class ADIOS_HTTP_CURL_Request(BaseHTTPRequestHandler):
     def do_GET(self):
+        logging.info("GET request,\nPath: %s\nHeaders:\n%s\n", str(self.path), str(self.headers))
         filepath = self.path
         curl.setopt(pycurl.URL, "sftp://localhost:" + filepath)
         header = self.headers["Range"]
         if header:
-            ranges = header.split("=")[1].split("-")
+            ranges = header.split("=")[1]
             """this is in fact ADIOS2 block. Expecting a reasonable size"""
             curl.setopt(pycurl.RANGE, ranges)
             data = curl.perform()
             """send data back"""
             self.wfile.write(data)
+            logging.info("sending ", len(data))
             return
 
         self.wfile.write("Ok".encode("utf-8"))
@@ -121,9 +124,9 @@ def main_paramiko(client, REMOTE_HOST, user, pkey, password):
         server.serve_forever()
 
     except KeyboardInterrupt:
-        print("Shutting down")
+        logging.info("Shutting down")
         server.server_close()
-        print("Server stopped")
+        logging.info("Server stopped")
 
 def main_curl(REMOTE_HOST, user, pkey, password):
     global curl
@@ -133,13 +136,13 @@ def main_curl(REMOTE_HOST, user, pkey, password):
     server = HTTPServer((HOST, PORT), ADIOS_HTTP_CURL_Request)
     try:
         # Listen for requests
-        print("Server now serving ...")
+        logging.info("Server now serving on port ", PORT)
         server.serve_forever()
 
     except KeyboardInterrupt:
-        print("Shutting down")
+        logging.info("Shutting down")
         server.server_close()
-        print("Server stopped")
+        logging.info("Server stopped")
 
 
 
