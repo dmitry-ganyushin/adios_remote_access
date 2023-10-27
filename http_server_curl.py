@@ -67,7 +67,7 @@ class ADIOS_HTTP_CURL_Request(BaseHTTPRequestHandler):
         curl.setopt(pycurl.URL, "sftp://localhost:" + filepath)
         header = self.headers["Range"]
         if header:
-            ranges = header.split("=")[1].split("-")
+            ranges = header.split("=")[1]
             """this is in fact ADIOS2 block. Expecting a reasonable size"""
             curl.setopt(pycurl.RANGE, ranges)
             data = curl.perform()
