@@ -11,7 +11,7 @@ PORT = 9999
 Typical command
 curl http://127.0.0.1:9999/home/ganyush/adiostests/test.bp/md.idx -i -H "Range: bytes=0-10"
 """
-buf = BytesIO
+buf = BytesIO()
 curl = pycurl.Curl()
 class FastTransport(paramiko.Transport):
 
@@ -23,16 +23,6 @@ class FastTransport(paramiko.Transport):
 
 class ADIOS_HTTP_PARAMIKO_Request(BaseHTTPRequestHandler):
     def do_GET(self):
-        # print("HEADERS:")
-        # print(self.headers)
-        # print("COMMAND:")
-        # print(self.command)
-        # print("PATH:")
-        # print(self.path)
-        # self.protocol_version = 'HTTP/1.1'
-        # self.send_response(200, 'OK')
-        # self.send_header('Content-type', 'text/html')
-        # self.end_headers()
         filepath = self.path
         remote_file = sftp.file(filepath, 'r')
         remote_file.prefetch()
@@ -70,9 +60,9 @@ class ADIOS_HTTP_CURL_Request(BaseHTTPRequestHandler):
             ranges = header.split("=")[1]
             """this is in fact ADIOS2 block. Expecting a reasonable size"""
             curl.setopt(pycurl.RANGE, ranges)
-            data = curl.perform()
+            curl.perform()
             """send data back"""
-            self.wfile.write(data)
+            self.wfile.write(buf.getvalue())
             return
 
         self.wfile.write("Ok".encode("utf-8"))
@@ -129,7 +119,7 @@ def main_curl(REMOTE_HOST, user, pkey, password):
     global curl
     curl.setopt(pycurl.WRITEFUNCTION,  buf.write)
     curl.setopt(pycurl.NOPROGRESS, 1)
-    curl.setopt(pycurl.USERPWD, password)
+    curl.setopt(pycurl.USERPWD, user + ":" + password)
     server = HTTPServer((HOST, PORT), ADIOS_HTTP_CURL_Request)
     try:
         # Listen for requests
