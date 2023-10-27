@@ -63,9 +63,8 @@ class ADIOS_HTTP_PARAMIKO_Request(BaseHTTPRequestHandler):
 
 class ADIOS_HTTP_CURL_Request(BaseHTTPRequestHandler):
     def do_GET(self):
-        curl.setopt(pycurl.NOPROGRESS, 1)
         filepath = self.path
-        curl.setopt(pycurl.URL, "sftp://localhost:9999" + filepath)
+        curl.setopt(pycurl.URL, "sftp://localhost:" + filepath)
         header = self.headers["Range"]
         if header:
             ranges = header.split("=")[1].split("-")
@@ -86,7 +85,7 @@ def auth():
     pkey = None
     client = None
 
-    if len(sys.argv) > 1 and sys.argv[2] == "--auth=2":
+    if len(sys.argv) > 2 and sys.argv[2] == "--auth=2":
         auth_key = input("Auth key:")
         key_password = ""
         try:
@@ -106,7 +105,7 @@ def auth():
 
 def main_paramiko(client, REMOTE_HOST, user, pkey, password):
     global sftp
-    if len(sys.argv) > 1 and sys.argv[2] == "--auth=2":
+    if len(sys.argv) > 2 and sys.argv[2] == "--auth=2":
         print("connecting ...")
         client.connect(hostname=REMOTE_HOST, username=user, pkey=pkey, password=password)
         print("connected")
