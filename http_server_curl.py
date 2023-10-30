@@ -55,7 +55,7 @@ class ADIOS_HTTP_PARAMIKO_Request(BaseHTTPRequestHandler):
 
 class ADIOS_HTTP_CURL_Request(BaseHTTPRequestHandler):
     def do_GET(self):
-        logging.info("GET request,\nPath: %s\nHeaders:\n%s\n", str(self.path), str(self.headers))
+        logging.info("GET request, Path: %s Headers: %s\n", str(self.path), str(self.headers))
         filepath = self.path
         curl.setopt(pycurl.URL, "sftp://" + REMOTE_HOST + ":" + filepath)
         header = self.headers["Range"]
@@ -63,9 +63,11 @@ class ADIOS_HTTP_CURL_Request(BaseHTTPRequestHandler):
             ranges = header.split("=")[1]
             """this is in fact ADIOS2 block. Expecting a reasonable size"""
             curl.setopt(pycurl.RANGE, ranges)
+            buf.truncate(0)
+            buf.seek(0)
             curl.perform()
             """send data back"""
-            logging.info("sending %s", str(len(buf.getvalue())))
+            logging.info("sending %s", str(len(buf.getbuffer())))
             self.wfile.write(buf.getvalue())
             return
 
