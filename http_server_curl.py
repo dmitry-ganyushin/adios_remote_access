@@ -8,6 +8,7 @@ import logging
 
 HOST = "127.0.0.1"
 PORT = 9999
+logging.basicConfig(level = logging.INFO)
 """
 Typical command
 curl http://127.0.0.1:9999/home/ganyush/adiostests/test.bp/md.idx -i -H "Range: bytes=0-10"
