@@ -1,7 +1,10 @@
 import paramiko
+import logging
 import time
 import getpass
 
+logging.basicConfig()
+logging.getLogger("paramiko").setLevel(logging.WARNING)
 # paramiko.util.log_to_file("paramiko.log")
 start_byte = 0  # Starting byte index (0 for the beginning of the file)
 end_byte = 1024  # Ending byte index (e.g., 1023 for the first 1KB)
@@ -12,24 +15,27 @@ end_byte = 1024  # Ending byte index (e.g., 1023 for the first 1KB)
 # transport.connect(None, "", "")
 
 REMOTE_HOST = input("hostname: ")
-#REMOTE_HOST = "localhost"
+REMOTE_HOST = "login.hpc.cam.ac.uk"
 transport = paramiko.Transport((REMOTE_HOST, 22))
 
 user = input("Username: ")
 key = input("Key:")
 if key != "":
     key_passphrase = input("Key passphrase:")
+
 try:
     password = getpass.getpass()
 except Exception as error:
     print('ERROR', error)
-#user = ""
+user = "hpcgany1"
 #password = ""
 
 if key == "":
     transport.connect(None, user, password)
 else:
-    private_key = paramiko.RSAKey.from_private_key_file(key, password=key_passphrase)
+    hkey = r"c:\users\yvg\.ssh\id_rsa2048"
+    key_passphrase = "aUgmetpamcirj21()n"
+    private_key = paramiko.RSAKey.from_private_key_file(hkey, password=key_passphrase)
     transport.connect(None, user, password, pkey=private_key)
 
 # Go!

@@ -1,0 +1,20 @@
+import paramiko
+k = paramiko.RSAKey.from_private_key_file(r"c:\users\yvg\.ssh\id_rsa2048", password="aUgmetpamcirj21()n")
+c = paramiko.SSHClient()
+c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+print("connecting")
+c.connect( hostname = "login.hpc.cam.ac.uk", username = "hpcgany1", pkey = k, password="253683")
+print("connected")
+# commands = [ "ls -l", "ls" ]
+# for command in commands:
+# 	print("Executing {}".format( command ))
+# 	stdin , stdout, stderr = c.exec_command(command)
+# 	print(stdout.read())
+# 	print( "Errors")
+# 	print(stderr.read())
+sftp = c.open_sftp()
+remote_file = sftp.file("/home/hpcgany1/history.txt")
+remote_file.seek(0)
+data = remote_file.read(100)
+print(data)
+c.close()
