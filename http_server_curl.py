@@ -65,7 +65,7 @@ class ADIOS_HTTP_CURL_Request(BaseHTTPRequestHandler):
             curl.setopt(pycurl.RANGE, ranges)
             curl.perform()
             """send data back"""
-            logging.info("sending ", len(buf.getvalue()))
+            logging.info("sending %s", str(len(buf.getvalue())))
             self.wfile.write(buf.getvalue())
             return
 
@@ -127,7 +127,7 @@ def main_curl(REMOTE_HOST, user, pkey, password):
     server = HTTPServer((HOST, PORT), ADIOS_HTTP_CURL_Request)
     try:
         # Listen for requests
-        logging.info("Server now serving on port ", PORT)
+        logging.info("Server now serving on port %s", str(PORT))
         server.serve_forever()
 
     except KeyboardInterrupt:
