@@ -71,6 +71,17 @@ class ADIOS_HTTP_CURL_Request(BaseHTTPRequestHandler):
             self.wfile.write(buf.getvalue())
             return
 
+        header = self.headers["Content-Length"]
+
+        if header:
+            curl.setopt(curl.NOBODY, 1)
+            curl.perform()
+            size = curl.getinfo(curl.CONTENT_LENGTH_DOWNLOAD)
+
+            """send data back"""
+            self.wfile.write(bytes(str(int(size)), "utf-8)"))
+            return
+
         self.wfile.write("Ok".encode("utf-8"))
 
 
