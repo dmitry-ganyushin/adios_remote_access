@@ -25,6 +25,7 @@ class FastTransport(paramiko.Transport):
 
 class ADIOS_HTTP_PARAMIKO_Request(BaseHTTPRequestHandler):
     def do_GET(self):
+        logging.info("GET request, Path: %s Headers: %s\n", str(self.path), str(self.headers))
         filepath = self.path
         remote_file = sftp.file(filepath, 'r')
         remote_file.prefetch()
@@ -39,6 +40,7 @@ class ADIOS_HTTP_PARAMIKO_Request(BaseHTTPRequestHandler):
             """this is in fact ADIOS2 block. Expecting a reasonable size"""
             data = remote_file.read(block_size)
             """send data back"""
+            logging.info("sending %s bytes", str(len(data)))
             self.wfile.write(data)
             return
 
@@ -48,6 +50,7 @@ class ADIOS_HTTP_PARAMIKO_Request(BaseHTTPRequestHandler):
             data = remote_file.stat()
 
             """send data back"""
+            logging.info("sending size %s bytes", str(data.st_size))
             self.wfile.write(bytes(str(int(data.st_size)), "utf-8)"))
             return
 
