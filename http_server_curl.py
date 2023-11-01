@@ -57,7 +57,11 @@ class ADIOS_HTTP_CURL_Request(BaseHTTPRequestHandler):
     def do_GET(self):
         logging.info("GET request, Path: %s Headers: %s\n", str(self.path), str(self.headers))
         filepath = self.path
-        curl.setopt(pycurl.URL, "sftp://" + REMOTE_HOST + ":" + filepath)
+        curl.reset()
+        curl.setopt(pycurl.URL, "sftp://" + REMOTE_HOST + "/" + filepath)
+        curl.setopt(pycurl.WRITEFUNCTION, buf.write)
+        curl.setopt(pycurl.NOPROGRESS, 1)
+        curl.setopt(pycurl.USERPWD, user + ":" + password)
         header = self.headers["Range"]
         if header:
             ranges = header.split("=")[1]
@@ -67,8 +71,10 @@ class ADIOS_HTTP_CURL_Request(BaseHTTPRequestHandler):
             buf.seek(0)
             curl.perform()
             """send data back"""
-            logging.info("sending %s", str(len(buf.getbuffer())))
-            self.wfile.write(buf.getvalue())
+            val = buf.getvalue()
+            logging.info("sending %s bytes", str(len(val)))
+            self.wfile.write(val)
+
             return
 
         header = self.headers["Content-Length"]
@@ -77,8 +83,9 @@ class ADIOS_HTTP_CURL_Request(BaseHTTPRequestHandler):
             curl.setopt(curl.NOBODY, 1)
             curl.perform()
             size = curl.getinfo(curl.CONTENT_LENGTH_DOWNLOAD)
-
+            curl.setopt(curl.NOBODY, 0)
             """send data back"""
+            logging.info("sending %s", str(int(size)))
             self.wfile.write(bytes(str(int(size)), "utf-8)"))
             return
 
@@ -134,9 +141,6 @@ def main_paramiko(client, REMOTE_HOST, user, pkey, password):
 
 def main_curl(REMOTE_HOST, user, pkey, password):
     global curl
-    curl.setopt(pycurl.WRITEFUNCTION,  buf.write)
-    curl.setopt(pycurl.NOPROGRESS, 1)
-    curl.setopt(pycurl.USERPWD, user + ":" + password)
     server = HTTPServer((HOST, PORT), ADIOS_HTTP_CURL_Request)
     try:
         # Listen for requests
